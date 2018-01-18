@@ -585,8 +585,8 @@ Answer => (code . y-or-n)"))
       (setf relations (remove nil values)))))
 
 ;; Process negative response
-(defgeneric positive-answer (tree criteria)
-  (:documentation "Process for positive response."))
+(defgeneric negative-answer (tree criteria)
+  (:documentation "Process for negative response."))
 
 (defmethod negative-answer ((key-tree string)
                             (key-criteria string))
