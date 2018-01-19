@@ -221,7 +221,7 @@
     (remove-decision-tree "test")))
 
 ;; :decision-from-interactive
-;; :print-description
+;; :print-decision
 (defun run-interactive-test ()
   (decision-to-tree "test" (make-instance 'decision :name "Decision one" :code "d-1"
                                           :descriptions '("Vel pretium lectus quam id leo in vitae turpis massa sed elementum"
@@ -261,7 +261,7 @@
   (criteria-to-decision-in-tree "test" "d-4" "c-3")
   (format t "------------------------------------------------------------------------------------------------------------~%")
   (populate-temporary-relations "test")
-  (decision-from-interactive "test")
+  (print-decision (decision-from-interactive "test"))
   (format t "------------------------------------------------------------------------------------------------------------~%")
   (format t "(temporary-records (decision-tree \"test\")) => ~s~%" (temporary-records (decision-tree "test")))
   (format t "------------------------------------------------------------------------------------------------------------~%")

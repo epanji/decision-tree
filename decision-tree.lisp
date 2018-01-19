@@ -654,7 +654,7 @@ Answer => (code . y-or-n)"))
          (output (when key-criteria
                    (decision-from-answer
                     decision-tree (answer decision-tree key-criteria)))))
-    (cond ((typep output 'decision) (print-decision output))
+    (cond ((typep output 'decision) output)
           ((typep output 'string) (decision-from-interactive decision-tree))
           (t (format *output* (argument-unknown decision-tree))))))
 
@@ -663,8 +663,11 @@ Answer => (code . y-or-n)"))
 (defgeneric print-decision (decision)
   (:documentation "Print decision using format for human readable."))
 
+(defmethod print-decision ((decision string))
+  (format *output* decision))
+
 (defmethod print-decision ((decision decision))
-  (format t "~2%~a / ~a~2%~{~a~%~}"
+  (format *output* "~2%~a / ~a~2%~{~a~%~}"
           (base-name decision)
           (base-code decision)
           (decision-descriptions decision)))
