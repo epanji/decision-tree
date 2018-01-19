@@ -382,6 +382,31 @@ criteria code from `decision' if exists."))
                                                   key-criteria))
       (remhash key-criteria criterions))))
 
+;; Remove decision from tree (decision-tree).
+(defgeneric remove-decision-from-tree (tree decision)
+  (:documentation
+   "Generic function to remove `decision' from `decision-tree'."))
+
+(defmethod remove-decision-from-tree ((key-tree string)
+                                      (key-decision string))
+  (let ((decision-tree (decision-tree key-tree)))
+    (remove-decision-from-tree decision-tree key-decision)))
+
+(defmethod remove-decision-from-tree ((key-tree string)
+                                      (decision decision))
+  (let ((decision-tree (decision-tree key-tree)))
+    (remove-decision-from-tree decision-tree decision)))
+
+(defmethod remove-decision-from-tree ((decision-tree decision-tree)
+                                      (decision decision))
+  (let ((key-decision (base-code decision)))
+    (remove-decision-from-tree decision-tree key-decision)))
+
+(defmethod remove-decision-from-tree ((decision-tree decision-tree)
+                                      (key-decision string))
+  (with-slots (decisions) decision-tree
+    (remhash key-decision decisions)))
+
 ;; Populate temporary relations.
 (defgeneric populate-temporary-relations (tree)
   (:documentation "Populate slot relations with association list."))

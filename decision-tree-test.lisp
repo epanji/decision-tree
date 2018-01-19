@@ -66,6 +66,7 @@
 ;; :criteria-codes
 ;; :count-criteria-code
 ;; :criteria-code
+;; :remove-decision-from-tree
 (defun test-criteria-decision-all ()
   (remove-decision-tree "test")
   (let ((decision-tree (decision-tree "test"))
@@ -162,6 +163,13 @@
     (format t "(question-criteria-code \"test\" c1) => ~s~%" (question-criteria-code "test" c1))
     (format t "(question-criteria-code decision-tree \"c-1\") => ~s~%" (question-criteria-code decision-tree "c-1"))
     (format t "(question-criteria-code decision-tree c1) => ~s~%" (question-criteria-code decision-tree c1))
+    (format t "------------------------------------------------------------------------------------------------------------~%")
+    (format t "(remove-decision-from-tree \"test\" \"d-1\") => ~s~%" (remove-decision-from-tree "test" "d-1"))
+    (format t "(remove-decision-from-tree \"test\" d2) => ~s~%" (remove-decision-from-tree "test" d2))
+    (decision-to-tree "test" d1)
+    (decision-to-tree "test" d2)
+    (format t "(remove-decision-from-tree decision-tree \"d-1\") => ~s~%" (remove-decision-from-tree decision-tree "d-1"))
+    (format t "(remove-decision-from-tree decision-tree d2) => ~s~%" (remove-decision-from-tree decision-tree d2))
     (format t "------------------------------------------------------------------------------------------------------------~%"))
   (remove-decision-tree "test"))
 

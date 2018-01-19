@@ -23,6 +23,7 @@
            :criteria-to-decision-in-tree
            :remove-criteria-from-decision-in-tree
            :remove-criteria-from-tree
+           :remove-decision-from-tree
            :temporary-relations
            :temporary-records
            :populate-temporary-relations
