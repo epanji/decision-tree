@@ -6,6 +6,8 @@
   (:export :*decision-trees*
            :*output*
            :decision-tree
+           :decision-tree-criterions
+           :decision-tree-decisions
            :argument-question
            :argument-unknown
            :remove-decision-tree

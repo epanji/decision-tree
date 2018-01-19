@@ -32,8 +32,10 @@
 
 (defclass decision-tree (argument temporary)
   ((criterions
+    :accessor decision-tree-criterions
     :initform (make-hash-table :test 'equal))
    (decisions
+    :accessor decision-tree-decisions
     :initform (make-hash-table :test 'equal)))
   (:documentation "Holder for collections of decision-tree elements."))
 
