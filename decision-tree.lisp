@@ -220,7 +220,7 @@
              (key-criteria string))
   (if (decision-from-tree decision-tree key-decision)
       (call-next-method)
-      (format *output* "Code ~s does not exists." key-decision)))
+      (format *output* "Code ~s does not exists.~%" key-decision)))
 
 (defmethod criteria-to-decision-in-tree ((decision-tree decision-tree)
                                          (key-decision string)
@@ -242,7 +242,7 @@
              (key-criteria string))
   (if (criteria-from-tree decision-tree key-criteria)
       (call-next-method)
-      (format *output* "Code ~s does not exists." key-criteria)))
+      (format *output* "Code ~s does not exists.~%" key-criteria)))
 
 (defmethod criteria-to-decision-in-tree ((decision-tree t) ; accept all
                                          (decision decision)
@@ -266,7 +266,7 @@
   ;; 2 2 2
   (with-slots (criterions) decision
     (if (find (base-code criteria) criterions :test 'equal)
-        (format *output* "Code ~s already added to ~s."
+        (format *output* "Code ~s already added to ~s.~%"
                 (base-code criteria) (base-code decision))
         (pushnew (base-code criteria) criterions))))
 
@@ -283,7 +283,7 @@
              (criteria criteria))
   (if (decision-from-tree decision-tree key-decision)
       (call-next-method)
-      (format *output* "Code ~s does not exists." key-decision)))
+      (format *output* "Code ~s does not exists.~%" key-decision)))
 
 (defmethod criteria-to-decision-in-tree ((decision-tree decision-tree)
                                          (key-decision string)
