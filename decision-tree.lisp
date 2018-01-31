@@ -444,8 +444,9 @@ criteria code from `decision' if exists."))
 
 (defmethod criteria-codes ((decision-tree decision-tree))
   (with-slots (relations) decision-tree
-    (remove-duplicates
-     (apply #'append (mapcar #'cdr relations)) :test #'equal)))
+    (let* ((combined (apply #'append (mapcar #'cdr relations)))
+           (unique (remove-duplicates combined :test #'equal)))
+      (sort unique #'string-lessp))))
 
 ;; Count criteria code appeared in relations.
 (defgeneric count-criteria-code (tree criteria)
