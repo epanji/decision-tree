@@ -105,7 +105,7 @@
 
 ;; interupt decision-tree creation.
 (defmethod criteria-from-tree :around ((key-tree string) (key-criteria string))
-  (when (gethash key-tree *decision-trees*)
+  (unless (null (gethash key-tree *decision-trees*))
     (call-next-method)))
 
 ;; 1 1
@@ -133,9 +133,9 @@
 ;; interupt overite criteria.
 (defmethod criteria-to-tree :around
   ((decision-tree decision-tree) (criteria criteria))
-  (if (criteria-from-tree decision-tree (base-code criteria))
-      (format *output* "Code ~s already exists.~%" (base-code criteria))
-      (call-next-method)))
+  (if (null (criteria-from-tree decision-tree (base-code criteria)))
+      (call-next-method)
+      (format *output* "Code ~s already exists.~%" (base-code criteria))))
 
 ;; 2 2
 (defmethod criteria-to-tree
@@ -155,7 +155,7 @@
 ;; interupt decision-tree creation.
 (defmethod decision-from-tree :around
   ((key-tree string) (key-decision string))
-  (when (gethash key-tree *decision-trees*)
+  (unless (null (gethash key-tree *decision-trees*))
     (call-next-method)))
 
 ;; 1 1
@@ -186,9 +186,9 @@
 ;; interupt overite decision.
 (defmethod decision-to-tree :around
   ((decision-tree decision-tree) (decision decision))
-  (if (decision-from-tree decision-tree (base-code decision))
-      (format *output* "Code ~s already exists.~%" (base-code decision))
-      (call-next-method)))
+  (if (null (decision-from-tree decision-tree (base-code decision)))
+      (call-next-method)
+      (format *output* "Code ~s already exists.~%" (base-code decision))))
 
 ;; 2 2
 (defmethod decision-to-tree
@@ -218,9 +218,9 @@
     :around ((decision-tree decision-tree)
              (key-decision string)
              (key-criteria string))
-  (if (decision-from-tree decision-tree key-decision)
-      (call-next-method)
-      (format *output* "Code ~s does not exists.~%" key-decision)))
+  (if (null (decision-from-tree decision-tree key-decision))
+      (format *output* "Code ~s does not exists.~%" key-decision)
+      (call-next-method)))
 
 (defmethod criteria-to-decision-in-tree ((decision-tree decision-tree)
                                          (key-decision string)
@@ -240,9 +240,9 @@
     :around ((decision-tree t)
              (decision decision)
              (key-criteria string))
-  (if (criteria-from-tree decision-tree key-criteria)
-      (call-next-method)
-      (format *output* "Code ~s does not exists.~%" key-criteria)))
+  (if (null (criteria-from-tree decision-tree key-criteria))
+      (format *output* "Code ~s does not exists.~%" key-criteria)
+      (call-next-method)))
 
 (defmethod criteria-to-decision-in-tree ((decision-tree t) ; accept all
                                          (decision decision)
@@ -265,10 +265,12 @@
                                          (criteria criteria))
   ;; 2 2 2
   (with-slots (criterions) decision
-    (if (find (base-code criteria) criterions :test 'equal)
-        (format *output* "Code ~s already added to ~s.~%"
-                (base-code criteria) (base-code decision))
-        (pushnew (base-code criteria) criterions))))
+    (let ((criteria-code (base-code criteria))
+          (decision-code (base-code decision)))
+      (if (null (find criteria-code criterions :test 'equal))
+          (pushnew criteria-code criterions)
+          (format *output* "Code ~s already added to ~s.~%"
+                  criteria-code decision-code)))))
 
 (defmethod criteria-to-decision-in-tree ((key-tree string)
                                          (key-decision string)
@@ -281,9 +283,9 @@
     :around ((decision-tree decision-tree)
              (key-decision string)
              (criteria criteria))
-  (if (decision-from-tree decision-tree key-decision)
-      (call-next-method)
-      (format *output* "Code ~s does not exists.~%" key-decision)))
+  (if (null (decision-from-tree decision-tree key-decision))
+      (format *output* "Code ~s does not exists.~%" key-decision)
+      (call-next-method)))
 
 (defmethod criteria-to-decision-in-tree ((decision-tree decision-tree)
                                          (key-decision string)
@@ -377,7 +379,7 @@ criteria code from `decision' if exists."))
 (defmethod remove-criteria-from-tree
     ((decision-tree decision-tree) (key-criteria string))
   (with-slots (criterions decisions) decision-tree
-    (when (gethash key-criteria criterions)
+    (unless (null (gethash key-criteria criterions))
       (loop for decision being the hash-value in decisions do
            (remove-criteria-from-decision-in-tree decision-tree
                                                   decision
@@ -424,9 +426,10 @@ criteria code from `decision' if exists."))
 (defmethod populate-temporary-relations ((decision-tree decision-tree))
   (with-slots (decisions relations) decision-tree
     (setf relations
-          (loop for decision being the hash-value in decisions collect
-               (cons (base-code decision)
-                     (decision-criterions decision))))))
+          (loop for code being the hash-key in decisions
+             for decision being the hash-value in decisions
+             for criteria-codes = (decision-criterions decision)
+             collect (cons code criteria-codes)))))
 
 
 ;;;; Implementation about getting decision from answered question.
@@ -527,7 +530,7 @@ criteria code from `decision' if exists."))
 
 (defmethod answer ((decision-tree decision-tree) (key-criteria string))
   (cons key-criteria
-        (when (temporary-relations decision-tree)
+        (unless (null (temporary-relations decision-tree))
           (y-or-n-p (question-criteria-code decision-tree key-criteria)))))
 
 ;; Get decision or more code from answer.
@@ -606,10 +609,11 @@ Answer => (code . y-or-n)"))
 (defmethod positive-answer ((decision-tree decision-tree)
                             (key-criteria string))
   (with-slots (relations) decision-tree
-    (let ((values (loop for items in relations collect
-                      (when (find key-criteria items :test 'equal)
-                        (remove key-criteria items :test 'equal)))))
-      (setf relations (remove nil values)))))
+    (setf relations
+          (loop for items in relations
+             for found = (find key-criteria items :test 'equal)
+             unless (null found)
+             collect (remove key-criteria items :test 'equal)))))
 
 ;; Process negative response
 (defgeneric negative-answer (tree criteria)
@@ -633,10 +637,11 @@ Answer => (code . y-or-n)"))
 (defmethod negative-answer ((decision-tree decision-tree)
                             (key-criteria string))
   (with-slots (relations) decision-tree
-    (let ((values (loop for items in relations collect
-                       (unless (find key-criteria items :test 'equal)
-                         items))))
-      (setf relations (remove nil values)))))
+    (setf relations
+          (loop for items in relations
+             for found = (find key-criteria items :test 'equal)
+             when (null found)
+             collect items))))
 
 ;; Get decision from question-answer interactively.
 ;; It must be populate first to get decision from interactive or it
@@ -651,7 +656,7 @@ Answer => (code . y-or-n)"))
 
 (defmethod decision-from-interactive ((decision-tree decision-tree))
   (let* ((key-criteria (criteria-code decision-tree))
-         (output (when key-criteria
+         (output (unless (null key-criteria)
                    (decision-from-answer
                     decision-tree (answer decision-tree key-criteria)))))
     (cond ((typep output 'decision) output)
