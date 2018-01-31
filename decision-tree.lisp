@@ -426,10 +426,10 @@ criteria code from `decision' if exists."))
 (defmethod populate-temporary-relations ((decision-tree decision-tree))
   (with-slots (decisions relations) decision-tree
     (setf relations
-          (loop for code being the hash-key in decisions
-             for decision being the hash-value in decisions
-             for criteria-codes = (decision-criterions decision)
-             collect (cons code criteria-codes)))))
+          (loop for decision being the hash-value in decisions
+             for code = (base-code decision)
+             for codes = (decision-criterions decision)
+             collect (cons code codes)))))
 
 
 ;;;; Implementation about getting decision from answered question.
