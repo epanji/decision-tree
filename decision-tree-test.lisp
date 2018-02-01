@@ -224,33 +224,33 @@
 ;; :print-decision
 (defun run-interactive-test ()
   (decision-to-tree "test" (make-instance 'decision :name "Decision one" :code "d-1"
-                                          :descriptions '("Vel pretium lectus quam id leo in vitae turpis massa sed elementum"
-                                                          "semper auctor neque, vitae tempus quam pellentesque nec nam aliquam"
-                                                          "sem et tortor consequat id porta nibh venenatis cras sed felis eget"
-                                                          "velit aliquet sagittis id consectetur? Magna fermentum iaculis eu"
-                                                          "non diam phasellus vestibulum lorem sed. Platea dictumst vestibulum"
-                                                          "praesent semper feugiat nibh.")))
+                                                    :descriptions '("Vel pretium lectus quam id leo in vitae turpis massa sed elementum"
+                                                                    "semper auctor neque, vitae tempus quam pellentesque nec nam aliquam"
+                                                                    "sem et tortor consequat id porta nibh venenatis cras sed felis eget"
+                                                                    "velit aliquet sagittis id consectetur? Magna fermentum iaculis eu"
+                                                                    "non diam phasellus vestibulum lorem sed. Platea dictumst vestibulum"
+                                                                    "praesent semper feugiat nibh.")))
   (decision-to-tree "test" (make-instance 'decision :name "Decision two" :code "d-2"
-                                          :descriptions '("Vel pretium lectus quam id leo in vitae turpis massa sed elementum"
-                                                          "tempus egestas sed sed risus pretium. Et molestie ac, feugiat sed"
-                                                          "lectus vestibulum mattis ullamcorper velit sed ullamcorper morbi"
-                                                          "tincidunt ornare massa, eget egestas purus viverra accumsan"
-                                                          "a. Risus nec feugiat in fermentum posuere urna nec tincidunt"
-                                                          "praesent semper feugiat nibh.")))
+                                                    :descriptions '("Vel pretium lectus quam id leo in vitae turpis massa sed elementum"
+                                                                    "tempus egestas sed sed risus pretium. Et molestie ac, feugiat sed"
+                                                                    "lectus vestibulum mattis ullamcorper velit sed ullamcorper morbi"
+                                                                    "tincidunt ornare massa, eget egestas purus viverra accumsan"
+                                                                    "a. Risus nec feugiat in fermentum posuere urna nec tincidunt"
+                                                                    "praesent semper feugiat nibh.")))
   (decision-to-tree "test" (make-instance 'decision :name "Decision three" :code "d-3"
-                                          :descriptions '("Vel pretium lectus quam id leo in vitae turpis massa sed elementum"
-                                                          "tempus egestas sed sed risus pretium. Et molestie ac, feugiat sed"
-                                                          "lectus vestibulum mattis ullamcorper velit sed ullamcorper morbi"
-                                                          "Magnis dis parturient montes, nascetur ridiculus mus mauris vitae"
-                                                          "a. Risus nec feugiat in fermentum posuere urna nec tincidunt"
-                                                          "praesent semper feugiat nibh.")))
+                                                    :descriptions '("Vel pretium lectus quam id leo in vitae turpis massa sed elementum"
+                                                                    "tempus egestas sed sed risus pretium. Et molestie ac, feugiat sed"
+                                                                    "lectus vestibulum mattis ullamcorper velit sed ullamcorper morbi"
+                                                                    "Magnis dis parturient montes, nascetur ridiculus mus mauris vitae"
+                                                                    "a. Risus nec feugiat in fermentum posuere urna nec tincidunt"
+                                                                    "praesent semper feugiat nibh.")))
   (decision-to-tree "test" (make-instance 'decision :name "Decision four" :code "d-4"
-                                          :descriptions '("Vel pretium lectus quam id leo in vitae turpis massa sed elementum"
-                                                          "sed risus. Interdum consectetur libero, id faucibus nisl tincidunt"
-                                                          "eget nullam non nisi est, sit amet facilisis magna etiam tempor,"
-                                                          "orci eu lobortis elementum, nibh tellus molestie nunc. Dignissim"
-                                                          "a. Risus nec feugiat in fermentum posuere urna nec tincidunt"
-                                                          "praesent semper feugiat nibh.")))
+                                                    :descriptions '("Vel pretium lectus quam id leo in vitae turpis massa sed elementum"
+                                                                    "sed risus. Interdum consectetur libero, id faucibus nisl tincidunt"
+                                                                    "eget nullam non nisi est, sit amet facilisis magna etiam tempor,"
+                                                                    "orci eu lobortis elementum, nibh tellus molestie nunc. Dignissim"
+                                                                    "a. Risus nec feugiat in fermentum posuere urna nec tincidunt"
+                                                                    "praesent semper feugiat nibh.")))
 
   (criteria-to-decision-in-tree "test" "d-1" (make-instance 'criteria :name "Criteria one" :code "c-1"))
   (criteria-to-decision-in-tree "test" "d-1" (make-instance 'criteria :name "Criteria two" :code "c-2"))
