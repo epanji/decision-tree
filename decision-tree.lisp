@@ -380,10 +380,10 @@ criteria code from `decision' if exists."))
     ((decision-tree decision-tree) (key-criteria string))
   (with-slots (criterions decisions) decision-tree
     (unless (null (gethash key-criteria criterions))
-      (loop for decision being the hash-value in decisions do
-        (remove-criteria-from-decision-in-tree decision-tree
-                                               decision
-                                               key-criteria))
+      (loop for decision being the hash-value in decisions
+            do (remove-criteria-from-decision-in-tree decision-tree
+                                                      decision
+                                                      key-criteria))
       (remhash key-criteria criterions))))
 
 ;; Remove decision from tree (decision-tree).
@@ -470,8 +470,8 @@ criteria code from `decision' if exists."))
 (defmethod count-criteria-code ((decision-tree decision-tree)
                                 (key-criteria string))
   (with-slots (relations) decision-tree
-    (loop for item in relations sum
-                                (count key-criteria item :test 'equal))))
+    (loop for item in relations
+          sum (count key-criteria item :test 'equal))))
 
 ;; Get highest criteria in relations (modus operandi statistic).
 (defgeneric criteria-code (tree)
@@ -482,11 +482,11 @@ criteria code from `decision' if exists."))
     (criteria-code decision-tree)))
 
 (defmethod criteria-code ((decision-tree decision-tree))
-  (let* ((codes (criteria-codes decision-tree))
-         (counted (loop for code in codes collect
-                                          (list code (count-criteria-code
-                                                      decision-tree code)))))
-    (caar (sort counted #'> :key #'cadr))))
+  (loop with codes = (criteria-codes decision-tree)
+        for code in codes
+        for amount = (count-criteria-code decision-tree code)
+        collect (list code amount) into counted
+        finally (return (caar (sort counted #'> :key #'cadr)))))
 
 ;; Question for code
 (defgeneric question-criteria-code (tree criteria)
