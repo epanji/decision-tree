@@ -100,11 +100,16 @@
 ;;; Get criteria object from tree (decision-tree).
 ;;; Parameter tree could be string or object.
 ;;; Parameter key has to be string.
+;;; For additional comments bellow:
+;;; 1 = string
+;;; 2 = object
 (defgeneric criteria-from-tree (tree key)
-  (:documentation "Generic function to get `criteria' from tree."))
+  (:documentation "Generic function to get `criteria' from
+`decision-tree'."))
 
-;;; interupt decision-tree creation.
-(defmethod criteria-from-tree :around ((key-tree string) (key-criteria string))
+;;; Interupt decision-tree creation when trying to get criteria.
+(defmethod criteria-from-tree :around ((key-tree string)
+                                       (key-criteria string))
   (unless (null (gethash key-tree *decision-trees*))
     (call-next-method)))
 
@@ -113,8 +118,8 @@
   (let ((decision-tree (decision-tree key-tree)))
     (criteria-from-tree decision-tree key-criteria)))
 
-(defmethod criteria-from-tree
-    ((decision-tree decision-tree) (key-criteria string))
+(defmethod criteria-from-tree ((decision-tree decision-tree)
+                               (key-criteria string))
   ;; 2 1
   (with-slots (criterions) decision-tree
     (gethash key-criteria criterions)))
@@ -122,23 +127,27 @@
 ;;; Set criteria object to tree (decision-tree).
 ;;; Parameter tree could be string or object.
 ;;; Parameter criteria has to be criteria object.
+;;; For additional comments bellow:
+;;; 1 = string
+;;; 2 = object
 (defgeneric criteria-to-tree (tree criteria)
-  (:documentation "Generic function to add `criteria' to tree."))
+  (:documentation "Generic function to add `criteria' to
+`decision-tree'."))
 
 (defmethod criteria-to-tree ((key-tree string) (criteria criteria))
   ;; 1 2
   (let ((decision-tree (decision-tree key-tree)))
     (criteria-to-tree decision-tree criteria)))
 
-;;; interupt overite criteria.
-(defmethod criteria-to-tree :around
-    ((decision-tree decision-tree) (criteria criteria))
+;;; Interupt overwrite criteria.
+(defmethod criteria-to-tree :around ((decision-tree decision-tree)
+                                     (criteria criteria))
   (if (null (criteria-from-tree decision-tree (base-code criteria)))
       (call-next-method)
       (format *output* "Code ~s already exists.~%" (base-code criteria))))
 
-(defmethod criteria-to-tree
-    ((decision-tree decision-tree) (criteria criteria))
+(defmethod criteria-to-tree ((decision-tree decision-tree)
+                             (criteria criteria))
   ;; 2 2
   (with-slots (criterions) decision-tree
     (setf (gethash (base-code criteria) criterions) criteria)))
@@ -150,11 +159,12 @@
 ;;; 1 = string
 ;;; 2 = object
 (defgeneric decision-from-tree (tree key)
-  (:documentation "Generic function to get `decision' from tree."))
+  (:documentation "Generic function to get `decision' from
+`decision-tree'."))
 
-;;; interupt decision-tree creation.
-(defmethod decision-from-tree :around
-    ((key-tree string) (key-decision string))
+;;; Interupt decision-tree creation when trying to get decision.
+(defmethod decision-from-tree :around ((key-tree string)
+                                       (key-decision string))
   (unless (null (gethash key-tree *decision-trees*))
     (call-next-method)))
 
@@ -163,8 +173,8 @@
   (let ((decision-tree (decision-tree key-tree)))
     (decision-from-tree decision-tree key-decision)))
 
-(defmethod decision-from-tree
-    ((decision-tree decision-tree) (key-decision string))
+(defmethod decision-from-tree ((decision-tree decision-tree)
+                               (key-decision string))
   ;; 2 1
   (with-slots (decisions) decision-tree
     (gethash key-decision decisions)))
@@ -183,15 +193,15 @@
   (let ((decision-tree (decision-tree key-tree)))
     (decision-to-tree decision-tree decision)))
 
-;;; interupt overite decision.
-(defmethod decision-to-tree :around
-    ((decision-tree decision-tree) (decision decision))
+;;; Interupt overwrite decision.
+(defmethod decision-to-tree :around ((decision-tree decision-tree)
+                                     (decision decision))
   (if (null (decision-from-tree decision-tree (base-code decision)))
       (call-next-method)
       (format *output* "Code ~s already exists.~%" (base-code decision))))
 
-(defmethod decision-to-tree
-    ((decision-tree decision-tree) (decision decision))
+(defmethod decision-to-tree ((decision-tree decision-tree)
+                             (decision decision))
   ;; 2 2
   (with-slots (decisions) decision-tree
     (setf (gethash (base-code decision) decisions) decision)))
@@ -205,14 +215,18 @@
 ;;; 1 = string
 ;;; 2 = object
 (defgeneric criteria-to-decision-in-tree (tree decision criteria)
-  (:documentation "Generic function to add `criteria' code to decision."))
+  (:documentation "Generic function to add criteria code to `decision'.
+If CRITERIA instance of `criteria', it will try to be added in
+`decision-tree'."))
 
 (defmethod criteria-to-decision-in-tree ((key-tree string)
                                          (key-decision string)
                                          (key-criteria string))
   ;; 1 1 1
   (let ((decision-tree (decision-tree key-tree)))
-    (criteria-to-decision-in-tree decision-tree key-decision key-criteria)))
+    (criteria-to-decision-in-tree decision-tree
+                                  key-decision
+                                  key-criteria)))
 
 (defmethod criteria-to-decision-in-tree
     :around ((decision-tree decision-tree)
@@ -375,21 +389,22 @@
    "Generic function to remove `criteria' from `decision-tree' and all \
 criteria code from `decision' if exists."))
 
-(defmethod remove-criteria-from-tree
-    ((decision-tree decision-tree) (criteria criteria))
+(defmethod remove-criteria-from-tree ((decision-tree decision-tree)
+                                      (criteria criteria))
   (remove-criteria-from-tree decision-tree (base-code criteria)))
 
-(defmethod remove-criteria-from-tree ((key-tree string) (criteria criteria))
+(defmethod remove-criteria-from-tree ((key-tree string)
+                                      (criteria criteria))
   (let ((decision-tree (decision-tree key-tree)))
     (remove-criteria-from-tree decision-tree criteria)))
 
-(defmethod remove-criteria-from-tree
-    ((key-tree string) (key-criteria string))
+(defmethod remove-criteria-from-tree ((key-tree string)
+                                      (key-criteria string))
   (let ((decision-tree (decision-tree key-tree)))
     (remove-criteria-from-tree decision-tree key-criteria)))
 
-(defmethod remove-criteria-from-tree
-    ((decision-tree decision-tree) (key-criteria string))
+(defmethod remove-criteria-from-tree ((decision-tree decision-tree)
+                                      (key-criteria string))
   (with-slots (criterions decisions) decision-tree
     (unless (null (gethash key-criteria criterions))
       (loop for decision being the hash-value in decisions
@@ -548,7 +563,7 @@ criteria code from `decision' if exists."))
 
 ;;; Get decision or more code from answer.
 (defgeneric decision-from-answer (tree answer)
-  (:documentation "Get final `decision' or more criteria code to be asked. \
+  (:documentation "Get final `decision' or more criteria code to be asked.
 Answer => (code . y-or-n)"))
 
 (defmethod decision-from-answer ((key-tree string)
@@ -556,8 +571,8 @@ Answer => (code . y-or-n)"))
   (let ((decision-tree (decision-tree key-tree)))
     (decision-from-answer decision-tree answer)))
 
-(defmethod decision-from-answer
-    :before ((decision-tree decision-tree) (answer cons))
+(defmethod decision-from-answer :before ((decision-tree decision-tree)
+                                         (answer cons))
   (with-slots (records) decision-tree
     (setf records (append records (list answer)))))
 
@@ -661,10 +676,9 @@ Answer => (code . y-or-n)"))
 ;;; will calculate empty relations.
 ;;; Should be reimplementing this method for other packages.
 (defgeneric decision-from-interactive (tree)
-  (:documentation
-   "Interactive question to get `decision'. Do not forget to run
- `populate-temporary-relations' once before this function or series
- of this function."))
+  (:documentation "Generic function to get `decision' interactively.
+Do not forget to run `populate-temporary-relations' once before this
+function or series of this function."))
 
 (defmethod decision-from-interactive ((key-tree string))
   (let ((decision-tree (decision-tree key-tree)))
@@ -676,7 +690,8 @@ Answer => (code . y-or-n)"))
                    (decision-from-answer
                     decision-tree (answer decision-tree key-criteria)))))
     (cond ((typep output 'decision) output)
-          ((typep output 'string) (decision-from-interactive decision-tree))
+          ((typep output 'string)
+           (decision-from-interactive decision-tree))
           (t (format *output* (argument-unknown decision-tree))))))
 
 ;;; Presentate decision for human readable format.

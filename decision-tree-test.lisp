@@ -38,8 +38,8 @@
 
 ;; :remove-all-decision-tree
 (defun test-remove-all-decision-tree ()
-  (format t "(eq 0 (hash-table-count (remove-all-decision-tree)) => ~a~%"
-          (eq 0 (hash-table-count (remove-all-decision-tree))))
+  (format t "(zerop (hash-table-count (remove-all-decision-tree)) => ~a~%"
+          (zerop (hash-table-count (remove-all-decision-tree))))
   (format t "------------------------------------------------------------------------------------------------------------~%"))
 
 ;; :base-code
