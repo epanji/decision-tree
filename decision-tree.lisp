@@ -708,4 +708,8 @@ function or series of this function."))
           (base-code decision)
           (decision-descriptions decision)))
 
+(defmethod print-object ((base base) stream)
+  (print-unreadable-object (base stream :type nil :identity nil)
+    (format stream "(~a)~6t~a" (base-code base) (base-name base))))
+
 ;;;; decision-tree.lisp ends here
