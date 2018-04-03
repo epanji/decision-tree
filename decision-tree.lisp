@@ -692,7 +692,7 @@ function or series of this function."))
     (cond ((typep output 'decision) output)
           ((typep output 'string)
            (decision-from-interactive decision-tree))
-          (t (format *output* (argument-unknown decision-tree))))))
+          (t (format nil (argument-unknown decision-tree))))))
 
 ;;; Presentate decision for human readable format.
 ;;; Should be reimplementing this method for other packages.
