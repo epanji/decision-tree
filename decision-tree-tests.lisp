@@ -1,12 +1,6 @@
-;;;; decision-tree-test.lisp
+;;;; decision-tree-tests.lisp
 
-(asdf:defsystem #:decision-tree-test
-  :description "Decision tree with CLOS approach test."
-  :version "0.0.1"
-  :depends-on (:decision-tree)
-  :components ((:file "decision-tree-test")))
-
-(in-package #:decision-tree-test)
+(in-package #:decision-tree/tests)
 
 ;; run all test
 (defun run-all-test ()
