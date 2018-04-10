@@ -8,9 +8,3 @@
   :serial t
   :components ((:file "package")
                (:file "decision-tree")))
-
-(asdf:defsystem #:decision-tree-test
-  :description "Decision tree with CLOS approach test."
-  :version "0.0.1"
-  :depends-on (:decision-tree)
-  :components ((:file "decision-tree-test")))
