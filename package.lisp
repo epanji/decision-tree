@@ -42,8 +42,8 @@
            #:decision-from-interactive
            #:print-decision))
 
-(defpackage #:decision-tree-test
-  (:nicknames #:dtree-test)
+(defpackage #:decision-tree/tests
+  (:nicknames #:dtree-tests)
   (:use #:cl #:decision-tree)
   (:export #:run-all-test
            #:run-interactive-test))
