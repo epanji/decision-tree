@@ -612,7 +612,7 @@ Answer => (code . y-or-n)"))
     (let ((length (length relations)))
       (case length
         (0 nil)
-        (1 (gethash (caar relations) decisions))
+        (1 (identity (gethash (caar relations) decisions)))
         (t (criteria-code decision-tree))))))
 
 ;;; Process positive response
