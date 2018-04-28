@@ -571,10 +571,17 @@ Answer => (code . y-or-n)"))
   (let ((decision-tree (decision-tree key-tree)))
     (decision-from-answer decision-tree answer)))
 
-(defmethod decision-from-answer :before ((decision-tree decision-tree)
+(defmethod decision-from-answer :around ((decision-tree decision-tree)
                                          (answer cons))
-  (with-slots (records) decision-tree
-    (setf records (append records (list answer)))))
+  (let ((recordable-p (null (find (car answer)
+                                  (temporary-records decision-tree)
+                                  :key #'car
+                                  :test #'equal))))
+    (when recordable-p
+      (with-slots (records) decision-tree
+        (setf records (append records (list answer))))
+      (call-next-method))
+    (decision-from-relations decision-tree)))
 
 (defmethod decision-from-answer ((decision-tree decision-tree)
                                  (answer cons))
