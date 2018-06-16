@@ -44,6 +44,6 @@
 
 (defpackage #:decision-tree/tests
   (:nicknames #:dtree-tests)
-  (:use #:cl #:decision-tree)
-  (:export #:run-all-test
+  (:use #:cl #:decision-tree #:fiveam)
+  (:export #:run-suite-tests
            #:run-interactive-test))
