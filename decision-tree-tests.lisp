@@ -62,10 +62,10 @@
     (criteria-to-decision-in-tree "test" "d-3" "c-2")
     (criteria-to-decision-in-tree "test" "d-4" "c-3")
     (format t "-------------------------------------------------------------------------------------------~%")
-    (populate-temporary-relations decision-tree)
+    (populate-relations decision-tree)
     (print-decision (decision-from-interactive "test"))
     (format t "-------------------------------------------------------------------------------------------~%")
-    (format t "(temporary-records (decision-tree \"test\")) => ~s~%" (temporary-records (decision-tree "test")))
+    (format t "(records (decision-tree \"test\")) => ~s~%" (records (decision-tree "test")))
     (format t "-------------------------------------------------------------------------------------------~%")))
 
 (defun run-suite-tests ()
@@ -80,28 +80,28 @@
   (with-new-decision-trees
     (is (typep (decision-tree "test") 'decision-tree))))
 
-;; :argument-question
-;; :argument-unknown
+;; :question
+;; :unknown
 (test change-argument-string
   (with-new-decision-trees
     (let ((decision-tree (decision-tree "test")))
-      (setf (argument-question decision-tree) "question")
-      (setf (argument-unknown decision-tree) "unknown")
-      (is (equal (argument-question decision-tree) "question"))
-      (is (equal (argument-unknown decision-tree) "unknown")))))
+      (setf (question decision-tree) "question")
+      (setf (unknown decision-tree) "unknown")
+      (is (equal (question decision-tree) "question"))
+      (is (equal (unknown decision-tree) "unknown")))))
 
-;; :base-name
-;; :base-code
+;; :name
+;; :code
 (test ensure-base-slots
   (with-new-decision-trees
     (let* ((code "some-code")
            (name "some-name")
            (decision (make-instance 'decision :code code :name name))
            (criteria (make-instance 'criteria :code code :name name)))
-      (is (string-equal (base-code decision) code))
-      (is (string-equal (base-name decision) name))
-      (is (string-equal (base-code criteria) code))
-      (is (string-equal (base-name criteria) name)))))
+      (is (string-equal (code decision) code))
+      (is (string-equal (name decision) name))
+      (is (string-equal (code criteria) code))
+      (is (string-equal (name criteria) name)))))
 
 ;; :decision-to-tree
 ;; :decision-from-tree
@@ -130,7 +130,7 @@
 (test criteria-code-to-decision-without-tree
   (with-dummy-data (decision-tree d2 d3 d4 c2 c3)
     (criteria-to-decision-in-tree nil d1 c1)
-    (is (equal (decision-criterions d1) '("c-1")))))
+    (is (equal (criterions d1) '("c-1")))))
 
 ;; :criteria-to-decision-in-tree
 ;; :remove-criteria-from-decision-in-tree
@@ -156,10 +156,10 @@
     (criteria-to-decision-in-tree "test" "d-1" c2)
     (criteria-to-decision-in-tree "test" "d-1" c3)
     (remove-criteria-from-tree "test" "c-2")
-    (is (equal (decision-criterions d1) '("c-3" "c-1")))))
+    (is (equal (criterions d1) '("c-3" "c-1")))))
 
-;; :populate-temporary-relations
-;; :temporary-relations
+;; :populate-relations
+;; :relations
 ;; :criteria-codes
 ;; :count-criteria-code
 ;; :criteria-code
@@ -180,19 +180,19 @@
     (criteria-to-decision-in-tree "test" "d-3" "c-2")
     (criteria-to-decision-in-tree "test" "d-4" "c-3")
     ;; populate relations
-    (is (equal (populate-temporary-relations decision-tree)
+    (is (equal (populate-relations decision-tree)
                '(("d-1" "c-3" "c-2" "c-1")
                  ("d-2" "c-3" "c-2")
                  ("d-3" "c-2")
                  ("d-4" "c-3"))))
-    (is (equal (temporary-relations decision-tree)
+    (is (equal (relations decision-tree)
                '(("d-1" "c-3" "c-2" "c-1")
                  ("d-2" "c-3" "c-2")
                  ("d-3" "c-2")
                  ("d-4" "c-3"))))
-    (setf (temporary-relations decision-tree) '())
-    (is (null (temporary-relations decision-tree)))
-    (is (equal (populate-temporary-relations "test")
+    (setf (relations decision-tree) '())
+    (is (null (relations decision-tree)))
+    (is (equal (populate-relations "test")
                '(("d-1" "c-3" "c-2" "c-1")
                  ("d-2" "c-3" "c-2")
                  ("d-3" "c-2")
@@ -214,8 +214,8 @@
     (is (equal (question-criteria-code decision-tree "c-1") "(c-1) Is it have criteria one?"))
     (is (equal (question-criteria-code decision-tree c1) "(c-1) Is it have criteria one?"))
     ;; decision-tree slots
-    (is (= (hash-table-count (decision-tree-criterions decision-tree)) 3))
-    (is (= (hash-table-count (decision-tree-decisions decision-tree)) 4))))
+    (is (= (hash-table-count (criterions decision-tree)) 3))
+    (is (= (hash-table-count (decisions decision-tree)) 4))))
 
 ;; :positive-answer
 ;; :negative-answer
@@ -239,33 +239,33 @@
     (criteria-to-decision-in-tree "test" "d-3" "c-2")
     (criteria-to-decision-in-tree "test" "d-4" "c-3")
     ;; positive negative answer
-    (populate-temporary-relations decision-tree)
-    (is (equal (temporary-relations decision-tree)
+    (populate-relations decision-tree)
+    (is (equal (relations decision-tree)
                '(("d-1" "c-3" "c-2" "c-1")
                  ("d-2" "c-3" "c-2")
                  ("d-3" "c-2")
                  ("d-4" "c-3"))))
     (positive-answer "test" "c-2")
-    (is (equal (temporary-relations decision-tree)
+    (is (equal (relations decision-tree)
                '(("d-1" "c-3" "c-1") ("d-2" "c-3") ("d-3"))))
     (negative-answer "test" "c-3")
-    (is (equal (temporary-relations decision-tree) '(("d-3"))))
+    (is (equal (relations decision-tree) '(("d-3"))))
     ;; decision from answer
-    (populate-temporary-relations decision-tree)
+    (populate-relations decision-tree)
     (decision-from-answer "test" '("c-2" . t))
-    (is (equal (temporary-relations decision-tree)
+    (is (equal (relations decision-tree)
                '(("d-1" "c-3" "c-1") ("d-2" "c-3") ("d-3"))))
     (decision-from-answer "test" '("c-3" . nil))
-    (is (equal (temporary-relations decision-tree) '(("d-3"))))
+    (is (equal (relations decision-tree) '(("d-3"))))
     ;; decision from answers
-    (populate-temporary-relations decision-tree)
+    (populate-relations decision-tree)
     (decision-from-answers "test" '(("c-2" . t) ("c-3" . nil)))
-    (is (equal (temporary-relations decision-tree) '(("d-3"))))
+    (is (equal (relations decision-tree) '(("d-3"))))
     ;; decision from relations
     (is (equal (decision-from-relations decision-tree) d3))
     (is (equal (decision-from-relations "test") d3))
     ;; avoid miss behavior repeated answer
-    (populate-temporary-relations decision-tree)
+    (populate-relations decision-tree)
     (is (equal (decision-from-answers decision-tree '(("c-2" . t) ("c-2" . t) ("c-3" . nil))) d3))
     (is (equal (decision-from-answers "test" '(("c-2" . t) ("c-2" . t) ("c-3" . nil))) d3))))
 
