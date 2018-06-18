@@ -61,12 +61,12 @@
     (criteria-to-decision-in-tree "test" "d-2" "c-3")
     (criteria-to-decision-in-tree "test" "d-3" "c-2")
     (criteria-to-decision-in-tree "test" "d-4" "c-3")
-    (format t "-------------------------------------------------------------------------------------------~%")
+    (format t "-----------------------------------------------------------------------------~%")
     (populate-relations decision-tree)
     (print-decision (decision-from-interactive "test"))
-    (format t "-------------------------------------------------------------------------------------------~%")
+    (format t "-----------------------------------------------------------------------------~%")
     (format t "(records (decision-tree \"test\")) => ~s~%" (records (decision-tree "test")))
-    (format t "-------------------------------------------------------------------------------------------~%")))
+    (format t "-----------------------------------------------------------------------------~%")))
 
 (defun run-suite-tests ()
   (run! 'decision-tree-suite))
@@ -75,6 +75,12 @@
 
 (in-suite decision-tree-suite)
 
+(test class-in-package
+  (is (find-class 'decision-tree))
+  (is (find-class 'decision-tree::element))
+  (is (find-class 'criteria))
+  (is (find-class 'decision)))
+
 ;; :decision-tree
 (test ensure-decision-tree
   (with-new-decision-trees
@@ -82,17 +88,17 @@
 
 ;; :question
 ;; :unknown
-(test change-argument-string
+(test change-control-string
   (with-new-decision-trees
     (let ((decision-tree (decision-tree "test")))
-      (setf (question decision-tree) "question")
+      (setf (question decision-tree) "question~a~a")
       (setf (unknown decision-tree) "unknown")
-      (is (equal (question decision-tree) "question"))
+      (is (equal (question decision-tree) "question~a~a"))
       (is (equal (unknown decision-tree) "unknown")))))
 
 ;; :name
 ;; :code
-(test ensure-base-slots
+(test element-slots
   (with-new-decision-trees
     (let* ((code "some-code")
            (name "some-name")
@@ -197,7 +203,7 @@
                  ("d-2" "c-3" "c-2")
                  ("d-3" "c-2")
                  ("d-4" "c-3"))))
-    ;; available codes
+    ;; available criteria codes
     (is (equal (criteria-codes "test") '("c-1" "c-2" "c-3")))
     (is (equal (criteria-codes decision-tree) '("c-1" "c-2" "c-3")))
     ;; count
