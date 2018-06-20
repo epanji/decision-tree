@@ -102,12 +102,16 @@
   (with-new-decision-trees
     (let* ((code "some-code")
            (name "some-name")
+           (desc '("description 1" "description 2"))
            (decision (make-instance 'decision :code code :name name))
            (criteria (make-instance 'criteria :code code :name name)))
       (is (string-equal (code decision) code))
       (is (string-equal (name decision) name))
       (is (string-equal (code criteria) code))
-      (is (string-equal (name criteria) name)))))
+      (is (string-equal (name criteria) name))
+      (is (equal (setf (code criteria) "code-1") "code-1"))
+      (is (equal (setf (name decision) "name-1") "name-1"))
+      (is (equal (setf (descriptions decision) desc) desc)))))
 
 ;; :decision-to-tree
 ;; :decision-from-tree
@@ -244,6 +248,9 @@
     (criteria-to-decision-in-tree "test" "d-2" "c-3")
     (criteria-to-decision-in-tree "test" "d-3" "c-2")
     (criteria-to-decision-in-tree "test" "d-4" "c-3")
+    ;; before populate
+    (is (equal (answer "test" c1) '("c-1" . nil)))
+    (is (equal (answer "test" "c-1") '("c-1" . nil)))
     ;; positive negative answer
     (populate-relations decision-tree)
     (is (equal (relations decision-tree)
@@ -274,6 +281,18 @@
     (populate-relations decision-tree)
     (is (equal (decision-from-answers decision-tree '(("c-2" . t) ("c-2" . t) ("c-3" . nil))) d3))
     (is (equal (decision-from-answers "test" '(("c-2" . t) ("c-2" . t) ("c-3" . nil))) d3))))
+
+(test stream-and-others
+  (with-dummy-data (decision-tree d3 d4 c2 c3)
+    (let ((message "unknown")
+          (*output* (make-string-output-stream))
+          (new-hash (make-hash-table :test 'equal)))
+      (is (null (print-decision d1)))
+      (is (null (print-object d2 *output*)))
+      (is (null (print-object c1 *output*)))
+      (setf (unknown (decision-tree "test")) message)
+      (is (equal (decision-from-interactive "test") message))
+      (is (eq (setf (decisions (decision-tree "test")) new-hash) new-hash)))))
 
 ;; :remove-decision-tree
 ;; :remove-all-decision-tree
