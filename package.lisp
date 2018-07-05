@@ -38,6 +38,7 @@
            #:decision-from-relations
            #:positive-answer
            #:negative-answer
+           #:code-tree
            #:decision-from-interactive
            #:print-decision))
 

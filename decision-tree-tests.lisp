@@ -294,6 +294,28 @@
       (is (equal (decision-from-interactive "test") message))
       (is (eq (setf (decisions (decision-tree "test")) new-hash) new-hash)))))
 
+;; :code-tree
+(test convert-to-cons-tree ()
+  (with-dummy-data ()
+    (decision-to-tree "test" d1)
+    (decision-to-tree "test" d2)
+    (decision-to-tree "test" d3)
+    (decision-to-tree "test" d4)
+    (criteria-to-tree "test" c1)
+    (criteria-to-tree "test" c2)
+    (criteria-to-tree "test" c3)
+    (criteria-to-decision-in-tree "test" "d-1" "c-1")
+    (criteria-to-decision-in-tree "test" "d-1" "c-2")
+    (criteria-to-decision-in-tree "test" "d-1" "c-3")
+    (criteria-to-decision-in-tree "test" "d-2" "c-2")
+    (criteria-to-decision-in-tree "test" "d-2" "c-3")
+    (criteria-to-decision-in-tree "test" "d-3" "c-2")
+    (criteria-to-decision-in-tree "test" "d-4" "c-3")
+    (is (equal '("c-2" "d-4" ("c-3" "d-3" ("c-1" "d-2" "d-1")))
+               (code-tree decision-tree)))
+    (is (equal '("c-2" "d-4" ("c-3" "d-3" ("c-1" "d-2" "d-1")))
+               (code-tree "test")))))
+
 ;; :remove-decision-tree
 ;; :remove-all-decision-tree
 (test remove-decision-tree

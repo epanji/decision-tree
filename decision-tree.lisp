@@ -478,9 +478,12 @@ criteria code from decision if exists."))
 
 (defmethod criteria-codes ((decision-tree decision-tree))
   (with-accessors ((relations relations)) decision-tree
-    (let* ((combined (apply #'append (mapcar #'cdr relations)))
-           (unique (remove-duplicates combined :test #'equal)))
-      (sort unique #'string-lessp))))
+    (criteria-codes relations)))
+
+(defmethod criteria-codes ((relations list))
+  (let* ((combined (apply #'append (mapcar #'cdr relations)))
+         (unique (remove-duplicates combined :test #'equal)))
+    (sort unique #'string-lessp)))
 
 ;;; Count criteria code appeared in relations.
 (defgeneric count-criteria-code (tree criteria)
@@ -504,8 +507,12 @@ criteria code from decision if exists."))
 (defmethod count-criteria-code ((decision-tree decision-tree)
                                 (key-criteria string))
   (with-accessors ((relations relations)) decision-tree
-    (loop for item in relations
-          sum (count key-criteria item :test 'equal))))
+    (count-criteria-code relations key-criteria)))
+
+(defmethod count-criteria-code ((relations list)
+                                (code string))
+  (loop for item in relations
+        sum (count code item :test 'equal)))
 
 ;;; Get highest criteria in relations (modus operandi statistic).
 (defgeneric criteria-code (tree)
@@ -516,13 +523,17 @@ criteria code from decision if exists."))
     (criteria-code decision-tree)))
 
 (defmethod criteria-code ((decision-tree decision-tree))
-  (loop with codes = (criteria-codes decision-tree)
+  (let ((relations (relations decision-tree)))
+    (criteria-code relations)))
+
+(defmethod criteria-code ((relations list))
+  (loop with codes = (criteria-codes relations)
         for code in codes
-        for amount = (count-criteria-code decision-tree code)
+        for amount = (count-criteria-code relations code)
         collect (list code amount) into counted
         finally (return (caar (sort counted #'> :key #'cadr)))))
 
-;;; Question for code
+;;; Question for code.
 (defgeneric question-criteria-code (tree criteria)
   (:documentation "Get question from criteria code."))
 
@@ -598,6 +609,13 @@ Answer => (code . y-or-n)"))
         (negative-answer decision-tree key-criteria))
     (decision-from-relations decision-tree)))
 
+(defmethod decision-from-answer ((relations list)
+                                 (answer cons))
+  (let ((key-criteria (car answer)))
+    (if (cdr answer)
+        (positive-answer relations key-criteria)
+        (negative-answer relations key-criteria))))
+
 ;;; Get decision from answers.
 (defgeneric decision-from-answers (tree answers)
   (:documentation "Get result from recorded answers."))
@@ -613,6 +631,12 @@ Answer => (code . y-or-n)"))
     (decision-from-answer decision-tree item))
   (decision-from-relations decision-tree))
 
+(defmethod decision-from-answers ((relations list)
+                                  (answers list))
+  (dolist (item answers)
+    (setf relations (decision-from-answer relations item)))
+  relations)
+
 ;;; Get decision from relations
 (defgeneric decision-from-relations (tree)
   (:documentation "Get decision from relations or code criteria."))
@@ -625,11 +649,18 @@ Answer => (code . y-or-n)"))
   (with-accessors ((relations relations)
                    (decisions decisions))
       decision-tree
-    (let ((length (length relations)))
-      (case length
-        (0 nil)
-        (1 (identity (gethash (caar relations) decisions)))
+    (let ((result (decision-from-relations relations)))
+      (typecase result
+        (null nil)
+        (list (identity (gethash (caar result) decisions)))
         (t (criteria-code decision-tree))))))
+
+(defmethod decision-from-relations ((relations list))
+  (let ((length (length relations)))
+    (case length
+      (0 nil)
+      (1 relations)
+      (t (criteria-code relations)))))
 
 ;;; Process positive response
 (defgeneric positive-answer (tree criteria)
@@ -653,11 +684,14 @@ Answer => (code . y-or-n)"))
 (defmethod positive-answer ((decision-tree decision-tree)
                             (key-criteria string))
   (with-accessors ((relations relations)) decision-tree
-    (setf relations
-          (loop for items in relations
-                for found = (find key-criteria items :test 'equal)
-                unless (null found)
-                  collect (remove key-criteria items :test 'equal)))))
+    (setf relations (positive-answer relations key-criteria))))
+
+(defmethod positive-answer ((relations list)
+                           (code string))
+  (loop for items in relations
+        for found = (find code items :test 'equal)
+        unless (null found)
+          collect (remove code items :test 'equal)))
 
 ;;; Process negative response
 (defgeneric negative-answer (tree criteria)
@@ -681,11 +715,38 @@ Answer => (code . y-or-n)"))
 (defmethod negative-answer ((decision-tree decision-tree)
                             (key-criteria string))
   (with-accessors ((relations relations)) decision-tree
-    (setf relations
-          (loop for items in relations
-                for found = (find key-criteria items :test 'equal)
-                when (null found)
-                  collect items))))
+    (setf relations (negative-answer relations key-criteria))))
+
+(defmethod negative-answer ((relations list)
+                            (code string))
+  (loop for items in relations
+        for found = (find code items :test 'equal)
+        when (null found)
+          collect items))
+
+;;; Get cons tree from decision tree.
+(defgeneric code-tree (tree)
+  (:documentation
+   "Generic function to get cons tree from decision-tree element codes."))
+
+(defmethod code-tree ((key-tree string))
+  (let ((decision-tree (decision-tree key-tree)))
+    (code-tree decision-tree)))
+
+(defmethod code-tree ((decision-tree decision-tree))
+  (let ((original-relations (populate-relations decision-tree)))
+    (labels ((build-tree (relations &optional answers)
+               (let ((result (decision-from-relations relations)))
+                 (typecase result
+                   (null "nil")
+                   (list (caar result))
+                   (string
+                    (let ((left (append answers (list (cons result nil))))
+                          (right (append answers (list (cons result t)))))
+                      (list result
+                            (build-tree (decision-from-answers original-relations left) left)
+                            (build-tree (decision-from-answers original-relations right) right))))))))
+      (build-tree original-relations))))
 
 ;;; Get decision from question-answer interactively.
 ;;; It must be populate first to get decision from interactive or it
@@ -705,10 +766,10 @@ function or series of this function."))
          (output (unless (null key-criteria)
                    (decision-from-answer
                     decision-tree (answer decision-tree key-criteria)))))
-    (cond ((typep output 'decision) output)
-          ((typep output 'string)
-           (decision-from-interactive decision-tree))
-          (t (format nil (unknown decision-tree))))))
+    (typecase output
+      (decision output)
+      (string (decision-from-interactive decision-tree))
+      (t (format nil (unknown decision-tree))))))
 
 ;;; Presentate decision for human readable format.
 ;;; Should be reimplementing this method for other packages.
