@@ -611,6 +611,7 @@ Answer => (code . y-or-n)"))
 
 (defmethod decision-from-answer ((relations list)
                                  (answer cons))
+  ;; instead decision, it will return new relations
   (let ((key-criteria (car answer)))
     (if (cdr answer)
         (positive-answer relations key-criteria)
@@ -633,6 +634,7 @@ Answer => (code . y-or-n)"))
 
 (defmethod decision-from-answers ((relations list)
                                   (answers list))
+  ;; instead decision, it will return new relations
   (dolist (item answers)
     (setf relations (decision-from-answer relations item)))
   relations)
@@ -656,6 +658,7 @@ Answer => (code . y-or-n)"))
         (t (criteria-code decision-tree))))))
 
 (defmethod decision-from-relations ((relations list))
+  ;; instead decision, it will return final relations
   (let ((length (length relations)))
     (case length
       (0 nil)
