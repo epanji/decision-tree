@@ -748,20 +748,20 @@ instance of decision-tree, or relations."))
     (code-tree relations)))
 
 (defmethod code-tree ((relations list))
-  (labels ((update (source params)
-             (decision-from-answers source params))
-           (process (code olds)
-             (let ((left (append olds (list (cons code nil))))
-                   (right (append olds (list (cons code t)))))
+  (labels ((update-relations (answers)
+             (decision-from-answers relations answers))
+           (building-process (code records)
+             (let ((left (append records (list (list code))))
+                   (right (append records (list (cons code t)))))
                (list code
-                     (build-tree (update relations left) left)
-                     (build-tree (update relations right) right))))
+                     (build-tree (update-relations left) left)
+                     (build-tree (update-relations right) right))))
            (build-tree (new-relations &optional answers)
              (let ((result (decision-from-relations new-relations)))
                (typecase result
                  (null "nil")
                  (list (caar result))
-                 (string (process result answers))))))
+                 (string (building-process result answers))))))
     (build-tree relations)))
 
 ;;; Get decision from question-answer interactively.
