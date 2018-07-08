@@ -14,29 +14,29 @@
   ((%decisions
     :initform (make-hash-table :test 'equal)
     :accessor decisions
-    :documentation "Hash table for decision collections.")
+    :documentation "Return hash table for decision collections.")
    (%criterions
     :initform (make-hash-table :test 'equal)
     :accessor criterions
-    :documentation "Hash table for criteria collections.")
+    :documentation "Return hash table for criteria collections.")
    (%relations
     :type list
     :initform '()
     :accessor relations
-    :documentation "List of codes (decision criterions) for calculation.")
+    :documentation "Return list of relation codes for calculation.")
    (%records
     :type list
     :initform '()
     :accessor records
-    :documentation "List of answered questions during calculation.")
+    :documentation "Return list of answered questions during calculation.")
    (%question
     :initform "(~a)~6tIs it have ~a?"
     :accessor question
-    :documentation "String for question with two input.")
+    :documentation "Return string for question with two arguments.")
    (%unknown
     :initform "~%Can not make decision.~%"
     :accessor unknown
-    :documentation "String for unknown message without input."))
+    :documentation "Return string for unknown message without arguments."))
   (:documentation
    "Holder for collections of decision-tree elements (decision,
 criteria), including relations, records, and control-string for
@@ -49,13 +49,14 @@ question and unknown messages."))
   "Global variable to hold all decision-tree creations.")
 
 (defun decision-tree (name)
-  "Function to get decision-tree by name or create new one."
+  "Return decision-tree from *decision-trees* by NAME, or create new
+one before return it."
   (or (gethash name *decision-trees*)
       (setf (gethash name *decision-trees*)
             (make-instance 'decision-tree))))
 
 (defun remove-decision-tree (name)
-  "Remove decision-tree by name from *decision-trees*."
+  "Remove decision-tree by NAME from *decision-trees*."
   (remhash name *decision-trees*))
 
 (defun remove-all-decision-tree ()
@@ -71,13 +72,13 @@ question and unknown messages."))
     :type string
     :initform ""
     :accessor code
-    :documentation "String code for elements of decision-tree.")
+    :documentation "Return string code for elements of decision-tree.")
    (%name
     :initarg :name
     :type string
     :initform ""
     :accessor name
-    :documentation "String name for elements of decision-tree."))
+    :documentation "Return string name for elements of decision-tree."))
   (:documentation "Abstract class for decision-tree elements."))
 
 (defclass criteria (element)
@@ -90,13 +91,13 @@ question and unknown messages."))
     :type list
     :initform '()
     :accessor criterions
-    :documentation "List of criteria codes for class decision.")
+    :documentation "Return list of criteria code for class decision.")
    (%descriptions
     :initarg :descriptions
     :type list
     :initform '()
     :accessor descriptions
-    :documentation "List of string for descriptions."))
+    :documentation "Return list of string for descriptions."))
   (:documentation "Class of decision-tree elements."))
 
 
@@ -109,8 +110,7 @@ question and unknown messages."))
 ;;; 1 = string
 ;;; 2 = object
 (defgeneric criteria-from-tree (tree key)
-  (:documentation
-   "Generic function to get criteria from decision-tree."))
+  (:documentation "Return criteria from decision-tree."))
 
 ;;; Interupt decision-tree creation when trying to get criteria.
 (defmethod criteria-from-tree :around ((key-tree string)
@@ -136,7 +136,9 @@ question and unknown messages."))
 ;;; 1 = string
 ;;; 2 = object
 (defgeneric criteria-to-tree (tree criteria)
-  (:documentation "Generic function to add criteria to decision-tree."))
+  (:documentation "Add criteria to decision-tree.
+TREE could be string or instance of decision-tree.
+CRITERIA has to be instance of criteria."))
 
 (defmethod criteria-to-tree ((key-tree string) (criteria criteria))
   ;; 1 2
@@ -163,7 +165,9 @@ question and unknown messages."))
 ;;; 1 = string
 ;;; 2 = object
 (defgeneric decision-from-tree (tree key)
-  (:documentation "Generic function to get decision from decision-tree."))
+  (:documentation "Return decision from decision-tree.
+TREE could be string or instance of decision-tree.
+KEY has to be a string."))
 
 ;;; Interupt decision-tree creation when trying to get decision.
 (defmethod decision-from-tree :around ((key-tree string)
@@ -189,7 +193,9 @@ question and unknown messages."))
 ;;; 1 = string
 ;;; 2 = object
 (defgeneric decision-to-tree (tree decision)
-  (:documentation "Generic function to add decision to tree."))
+  (:documentation "Add decision to decision-tree.
+TREE could be string or instance of decision-tree.
+DECISION has to be instance of decision."))
 
 (defmethod decision-to-tree ((key-tree string) (decision decision))
   ;; 1 2
@@ -218,9 +224,8 @@ question and unknown messages."))
 ;;; 1 = string
 ;;; 2 = object
 (defgeneric criteria-to-decision-in-tree (tree decision criteria)
-  (:documentation "Generic function to add criteria code to DECISION.
-If CRITERIA instance of criteria, it will try to be added in
-decision-tree."))
+  (:documentation "Add criteria code to DECISION. If CRITERIA instance
+of criteria, it will try to be added in decision-tree."))
 
 (defmethod criteria-to-decision-in-tree ((key-tree string)
                                          (key-decision string)
@@ -326,9 +331,8 @@ decision-tree."))
 ;;; 1 = string
 ;;; 2 = object
 (defgeneric remove-criteria-from-decision-in-tree (tree decision criteria)
-  (:documentation
-   "Generic function to remove criteria code from decision. The
-decision could be inside or outside decision-tree."))
+  (:documentation "Remove criteria code from DECISION. TREE could be
+NIL if DECISION is instance of decision."))
 
 (defmethod remove-criteria-from-decision-in-tree ((key-tree string)
                                                   (key-decision string)
@@ -389,9 +393,8 @@ decision could be inside or outside decision-tree."))
 ;; Remove criteria from tree with side effect remove all existed
 ;; criteria in decision criterions.
 (defgeneric remove-criteria-from-tree (tree criteria)
-  (:documentation
-   "Generic function to remove criteria from decision-tree and all
-criteria code from decision if exists."))
+  (:documentation "Remove criteria from decision-tree and all criteria
+code from decision if exists."))
 
 (defmethod remove-criteria-from-tree ((decision-tree decision-tree)
                                       (criteria criteria))
@@ -420,8 +423,7 @@ criteria code from decision if exists."))
 
 ;;; Remove decision from tree (decision-tree).
 (defgeneric remove-decision-from-tree (tree decision)
-  (:documentation
-   "Generic function to remove decision from decision-tree."))
+  (:documentation "Remove DECISION from decision-tree."))
 
 (defmethod remove-decision-from-tree ((key-tree string)
                                       (key-decision string))
@@ -470,7 +472,7 @@ criteria code from decision if exists."))
 
 ;;; Get criteria codes from relations in list (no duplicate).
 (defgeneric criteria-codes (tree)
-  (:documentation "Get list of codes for criteria from relations."))
+  (:documentation "Return list of code for criteria from relations."))
 
 (defmethod criteria-codes ((key-tree string))
   (let ((decision-tree (decision-tree key-tree)))
@@ -516,7 +518,7 @@ criteria code from decision if exists."))
 
 ;;; Get highest criteria in relations (modus operandi statistic).
 (defgeneric criteria-code (tree)
-  (:documentation "Get most code for criteria from relations."))
+  (:documentation "Return most code for criteria from relations."))
 
 (defmethod criteria-code ((key-tree string))
   (let ((decision-tree (decision-tree key-tree)))
@@ -535,7 +537,7 @@ criteria code from decision if exists."))
 
 ;;; Question for code.
 (defgeneric question-criteria-code (tree criteria)
-  (:documentation "Get question from criteria code."))
+  (:documentation "Return string question from criteria code."))
 
 (defmethod question-criteria-code ((key-tree string)
                                    (key-criteria string))
@@ -581,8 +583,9 @@ criteria code from decision if exists."))
 
 ;;; Get decision or more code from answer.
 (defgeneric decision-from-answer (tree answer)
-  (:documentation "Get final decision or more criteria code to be asked.
-Answer => (code . y-or-n)"))
+  (:documentation "Return final decision or more criteria code to be
+asked. Exception for TREE as relations, it will return new
+relations. ANSWER => (code . y-or-n)."))
 
 (defmethod decision-from-answer ((key-tree string)
                                  (answer cons))
@@ -619,7 +622,9 @@ Answer => (code . y-or-n)"))
 
 ;;; Get decision from answers.
 (defgeneric decision-from-answers (tree answers)
-  (:documentation "Get result from recorded answers."))
+  (:documentation "Return final decision or more criteria code to be
+asked as a result from recorded answers. Exception for TREE as
+relations, it will return new relations."))
 
 (defmethod decision-from-answers ((key-tree string)
                                   (answers list))
@@ -641,7 +646,9 @@ Answer => (code . y-or-n)"))
 
 ;;; Get decision from relations
 (defgeneric decision-from-relations (tree)
-  (:documentation "Get decision from relations or code criteria."))
+  (:documentation "Return final decision or more criteria code to be
+asked as a result from relations. Exception for TREE as relations, it
+will return final relations."))
 
 (defmethod decision-from-relations ((key-tree string))
   (let ((decision-tree (decision-tree key-tree)))
@@ -729,35 +736,41 @@ Answer => (code . y-or-n)"))
 
 ;;; Get cons tree from decision tree.
 (defgeneric code-tree (tree)
-  (:documentation
-   "Generic function to get cons tree from decision-tree element codes."))
+  (:documentation "Return cons tree of codes. TREE could be string,
+instance of decision-tree, or relations."))
 
 (defmethod code-tree ((key-tree string))
   (let ((decision-tree (decision-tree key-tree)))
     (code-tree decision-tree)))
 
 (defmethod code-tree ((decision-tree decision-tree))
-  (let ((original-relations (populate-relations decision-tree)))
-    (labels ((build-tree (relations &optional answers)
-               (let ((result (decision-from-relations relations)))
-                 (typecase result
-                   (null "nil")
-                   (list (caar result))
-                   (string
-                    (let ((left (append answers (list (cons result nil))))
-                          (right (append answers (list (cons result t)))))
-                      (list result
-                            (build-tree (decision-from-answers original-relations left) left)
-                            (build-tree (decision-from-answers original-relations right) right))))))))
-      (build-tree original-relations))))
+  (let ((relations (populate-relations decision-tree)))
+    (code-tree relations)))
+
+(defmethod code-tree ((relations list))
+  (labels ((update (source params)
+             (decision-from-answers source params))
+           (process (code olds)
+             (let ((left (append olds (list (cons code nil))))
+                   (right (append olds (list (cons code t)))))
+               (list code
+                     (build-tree (update relations left) left)
+                     (build-tree (update relations right) right))))
+           (build-tree (new-relations &optional answers)
+             (let ((result (decision-from-relations new-relations)))
+               (typecase result
+                 (null "nil")
+                 (list (caar result))
+                 (string (process result answers))))))
+    (build-tree relations)))
 
 ;;; Get decision from question-answer interactively.
 ;;; It must be populate first to get decision from interactive or it
 ;;; will calculate empty relations.
 ;;; Should be reimplementing this method for other packages.
 (defgeneric decision-from-interactive (tree)
-  (:documentation "Generic function to get decision interactively.
-Do not forget to run populate-relations once before this
+  (:documentation "Return decision after interactively asked
+questions. Do not forget to run populate-relations once before this
 function or series of this function."))
 
 (defmethod decision-from-interactive ((key-tree string))
