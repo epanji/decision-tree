@@ -42,9 +42,4 @@
            #:code-tree
            #:decision-from-interactive
            #:print-decision))
-
-(defpackage #:decision-tree/tests
-  (:nicknames #:dtree-tests)
-  (:use #:cl #:decision-tree #:fiveam)
-  (:export #:run-suite-tests
-           #:run-interactive-test))
+
