@@ -5,6 +5,7 @@
   (:use #:cl)
   (:export #:*decision-trees*
            #:*output*
+           #:*code-tree-order*
            #:decision-tree
            #:decisions
            #:criterions

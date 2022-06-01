@@ -1,8 +1,5 @@
-;;;; decision-tree.lisp
+(cl:in-package #:decision-tree)
 
-(in-package #:decision-tree)
-
-
 ;;;; IO handler
 
 (defparameter *output* cl:*standard-output*)
@@ -735,6 +732,10 @@ will return final relations."))
           collect items))
 
 ;;; Get cons tree from decision tree.
+(defparameter *code-tree-order* :c-n-y
+  "Ordering code tree for C as CODE, N as NO and Y as YES.")
+(declaim (type (member :c-n-y :c-y-n) *code-tree-order*))
+
 (defgeneric code-tree (tree)
   (:documentation "Return cons tree of codes. TREE could be string,
 instance of decision-tree, or relations."))
@@ -753,9 +754,13 @@ instance of decision-tree, or relations."))
            (building-process (code records)
              (let ((left (append records (list (list code))))
                    (right (append records (list (cons code t)))))
-               (list code
-                     (build-tree (update-relations left) left)
-                     (build-tree (update-relations right) right))))
+               (case *code-tree-order*
+                 (:c-n-y (list code
+                               (build-tree (update-relations left) left)
+                               (build-tree (update-relations right) right)))
+                 (:c-y-n (list code
+                               (build-tree (update-relations right) right)
+                               (build-tree (update-relations left) left))))))
            (build-tree (new-relations &optional answers)
              (let ((result (decision-from-relations new-relations)))
                (typecase result
@@ -804,3 +809,4 @@ function or series of this function."))
 (defmethod print-object ((element element) stream)
   (print-unreadable-object (element stream :type nil :identity nil)
     (format stream "(~a)~6t~a" (code element) (name element))))
+
