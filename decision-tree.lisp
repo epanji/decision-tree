@@ -27,7 +27,7 @@
     :accessor records
     :documentation "Return list of answered questions during calculation.")
    (%question
-    :initform "(~a)~6tIs it have ~a?"
+    :initform "(~A)~6TIs it have ~A?"
     :accessor question
     :documentation "Return string for question with two arguments.")
    (%unknown
@@ -147,7 +147,7 @@ CRITERIA has to be instance of criteria."))
                                      (criteria criteria))
   (if (null (criteria-from-tree decision-tree (code criteria)))
       (call-next-method)
-      (format *output* "~%Code ~s already exists." (code criteria))))
+      (format *output* "~%Code ~S already exists." (code criteria))))
 
 (defmethod criteria-to-tree ((decision-tree decision-tree)
                              (criteria criteria))
@@ -204,7 +204,7 @@ DECISION has to be instance of decision."))
                                      (decision decision))
   (if (null (decision-from-tree decision-tree (code decision)))
       (call-next-method)
-      (format *output* "~%Code ~s already exists." (code decision))))
+      (format *output* "~%Code ~S already exists." (code decision))))
 
 (defmethod decision-to-tree ((decision-tree decision-tree)
                              (decision decision))
@@ -238,7 +238,7 @@ of criteria, it will try to be added in decision-tree."))
              (key-decision string)
              (key-criteria string))
   (if (null (decision-from-tree decision-tree key-decision))
-      (format *output* "~%Code ~s does not exists." key-decision)
+      (format *output* "~%Code ~S does not exists." key-decision)
       (call-next-method)))
 
 (defmethod criteria-to-decision-in-tree ((decision-tree decision-tree)
@@ -260,7 +260,7 @@ of criteria, it will try to be added in decision-tree."))
              (decision decision)
              (key-criteria string))
   (if (null (criteria-from-tree decision-tree key-criteria))
-      (format *output* "~%Code ~s does not exists." key-criteria)
+      (format *output* "~%Code ~S does not exists." key-criteria)
       (call-next-method)))
 
 (defmethod criteria-to-decision-in-tree ((decision-tree t) ; accept all
@@ -294,7 +294,7 @@ of criteria, it will try to be added in decision-tree."))
           (decision-code (code decision)))
       (if (null (find criteria-code criterions :test 'equal))
           (pushnew criteria-code criterions)
-          (format *output* "~%Code ~s already added to ~s."
+          (format *output* "~%Code ~S already added to ~S."
                   criteria-code decision-code)))))
 
 (defmethod criteria-to-decision-in-tree ((key-tree string)
@@ -309,7 +309,7 @@ of criteria, it will try to be added in decision-tree."))
              (key-decision string)
              (criteria criteria))
   (if (null (decision-from-tree decision-tree key-decision))
-      (format *output* "~%Code ~s does not exists." key-decision)
+      (format *output* "~%Code ~S does not exists." key-decision)
       (call-next-method)))
 
 (defmethod criteria-to-decision-in-tree ((decision-tree decision-tree)
@@ -801,12 +801,12 @@ function or series of this function."))
   (format *output* decision))
 
 (defmethod print-decision ((decision decision))
-  (format *output* "~2%~a / ~a~2%~{~a~%~}"
+  (format *output* "~2%~A / ~A~2%~{~A~%~}"
           (name decision)
           (code decision)
           (descriptions decision)))
 
 (defmethod print-object ((element element) stream)
   (print-unreadable-object (element stream :type nil :identity nil)
-    (format stream "(~a)~6t~a" (code element) (name element))))
+    (format stream "(~A)~6T~A" (code element) (name element))))
 
